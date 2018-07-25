@@ -25,6 +25,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+// OpenGL Headers.
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+using namespace glm;
+
 
 // Constant Defines.
 
@@ -41,4 +47,11 @@
  */
 int main(int argc, char* argv[]) {
     printf("Hello World!\n");
+
+    // Initialize GLFW.
+    glewExperimental = true;
+    if ( !glfwInit() ) {
+        fprintf(stderr, "Failed to initialize GLFW.\n");
+        exit(1);
+    }
 }
