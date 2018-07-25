@@ -1,2 +1,3 @@
+
 all:
-	g++ -Wall -Wpedantic -std=gnu++98 *.c -g -o DevGame -lglfw -lGLEW
+	g++ -Wall -Wpedantic -std=gnu++98 *.c -g -o DevGame -lglfw -lGLEW -lGL -lX11 -lpthread -lXrandr -lXi -ldl
