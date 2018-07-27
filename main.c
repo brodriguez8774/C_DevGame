@@ -98,6 +98,7 @@ int main(int argc, char* argv[]) {
     glfwMakeContextCurrent(window);
     glfwSetKeyCallback(window, key_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // Uncomment to render triangle outlines only.
 
     // Check that window initialized fully?
     glewExperimental=GL_TRUE;
@@ -213,32 +214,44 @@ unsigned int create_fragment_shader(unsigned int fragment_shader) {
 void render_data(unsigned int shader_program) {
     unsigned int vertex_buffer_object;
     unsigned int vertex_array_object;
+    unsigned int element_buffer_object;
     float verticies[] = {
-        0.0f, 0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f
+        0.0f, 0.8f, 0.0f,   // 0 - Top middle.
+        0.4f, 0.0f, 0.0f,   // 1 - Middle right.
+        0.8f, -0.8f, 0.0f,  // 2 - Bottom right.
+        0.0f, -0.8f, 0.0f,  // 3 - Bottom middle.
+        -0.8f, -0.8f, 0.0f, // 4 - Bottom left.
+        -0.4f, 0.0f, 0.0f,  // 5 - Middle left.
+    };
+    unsigned int indices[] = {
+        0, 1, 5,    // Top triangle.
+        1, 2, 3,    // Bottom left triangle.
+        5, 3, 4,    // Bottom right triangle.
     };
 
     // Generate array object and buffers.
     glGenVertexArrays(1, &vertex_array_object);
     glGenBuffers(1, &vertex_buffer_object);
+    glGenBuffers(1, &element_buffer_object);
 
     // Add vertex data to graphics buffer. Start with array object, then vertex buffers.
     glBindVertexArray(vertex_buffer_object);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
     glBufferData(GL_ARRAY_BUFFER, sizeof(verticies), verticies, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Set vertix attribute pointers?
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (3 * sizeof(float)), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
 
     // Use shader program when rendering.
     glUseProgram(shader_program);
 
     // Draw object.
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES, (sizeof(indices) / 3), GL_UNSIGNED_INT, 0);
 }
 
 
