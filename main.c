@@ -41,19 +41,20 @@
 const char* VERTEX_SHADER_SOURCE = "#version 330 core\n"
 "layout (location = 0) in vec3 a_position;\n"
 "layout (location = 1) in vec3 a_color;\n"
-"out vec3 generated_color;\n"
+"out vec3 static_color;\n"
 "void main() {\n"
-"    gl_Position = vec4(a_position, 1.0);\n"
-"   generated_color = a_color;"
+"   gl_Position = vec4(a_position, 1.0);\n"
+"   static_color = a_color;"
 "}\n\0 ";
 
 const char* FRAGMENT_SHADER_SOURCE = "#version 330 core\n"
-// "uniform vec4 generated_color;\n"
-"in vec3 generated_color;\n"
+"uniform vec4 generated_color;\n"
+"in vec3 static_color;\n"
 "out vec4 frag_color;\n"
 "void main() {\n"
 // "   frag_color = generated_color;\n"
-"   frag_color = vec4(generated_color, 1.0);"
+// "   frag_color = vec4(static_color, 1.0);"
+"   frag_color = vec4(static_color - generated_color.xyz, 1.0);"
 "}\n\0 ";
 
 
@@ -262,12 +263,15 @@ void render_data(unsigned int shader_program) {
 
     // Set shader color.
     float time_value = glfwGetTime();
+    float red = (cos(time_value) / 2.0f) + 0.5f;
     float green = (sin(time_value) / 2.0f) + 0.5f;
+    float blue = (-cos(time_value) / 2.0f) + 0.5f;
+    float manipulator = (-sin(time_value) / 2.0f) + 0.5f;
     int vertex_color_location = glGetUniformLocation(shader_program, "generated_color");
 
     // Use shader program when rendering.
     glUseProgram(shader_program);
-    glUniform4f(vertex_color_location, 0.0f, green, 0.0f, 1.0f);
+    glUniform4f(vertex_color_location, (red - manipulator), (green - manipulator), (blue - manipulator), 1.0f);
 
     // Draw object.
     glDrawElements(GL_TRIANGLES, (sizeof(indices) / 3), GL_UNSIGNED_INT, 0);
