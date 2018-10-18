@@ -39,16 +39,21 @@
 
 // Shaders copied from https://learnopengl.com/Getting-started/Hello-Triangle
 const char* VERTEX_SHADER_SOURCE = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n\n"
+"layout (location = 0) in vec3 a_position;\n"
+"layout (location = 1) in vec3 a_color;\n"
+"out vec3 generated_color;\n"
 "void main() {\n"
-"    gl_Position = vec4(aPos, 1.0);\n"
+"    gl_Position = vec4(a_position, 1.0);\n"
+"   generated_color = a_color;"
 "}\n\0 ";
 
 const char* FRAGMENT_SHADER_SOURCE = "#version 330 core\n"
-"uniform vec4 generated_color;\n"
-"out vec4 frag_color;\n\n"
+// "uniform vec4 generated_color;\n"
+"in vec3 generated_color;\n"
+"out vec4 frag_color;\n"
 "void main() {\n"
-"    frag_color = generated_color;\n"
+// "   frag_color = generated_color;\n"
+"   frag_color = vec4(generated_color, 1.0);"
 "}\n\0 ";
 
 
@@ -220,12 +225,13 @@ void render_data(unsigned int shader_program) {
     unsigned int vertex_array_object;
     unsigned int element_buffer_object;
     float verticies[] = {
-        0.0f, 0.8f, 0.0f,   // 0 - Top middle.
-        0.4f, 0.0f, 0.0f,   // 1 - Middle right.
-        0.8f, -0.8f, 0.0f,  // 2 - Bottom right.
-        0.0f, -0.8f, 0.0f,  // 3 - Bottom middle.
-        -0.8f, -0.8f, 0.0f, // 4 - Bottom left.
-        -0.4f, 0.0f, 0.0f,  // 5 - Middle left.
+        // Positions            // Colors
+         0.0f,  0.8f,  0.0f,    1.0f, 0.0f, 0.0f, // 0 - Top middle.
+         0.4f,  0.0f,  0.0f,    0.5f, 0.5f, 0.0f, // 1 - Middle right.
+         0.8f, -0.8f,  0.0f,    0.0f, 1.0f, 0.0f, // 2 - Bottom right.
+         0.0f, -0.8f,  0.0f,    0.0f, 0.5f, 0.5f, // 3 - Bottom middle.
+        -0.8f, -0.8f,  0.0f,    0.0f, 0.0f, 1.0f, // 4 - Bottom left.
+        -0.4f,  0.0f,  0.0f,    0.5f, 0.0f, 0.5f, // 5 - Middle left.
     };
     unsigned int indices[] = {
         0, 1, 5,    // Top triangle.
@@ -245,9 +251,12 @@ void render_data(unsigned int shader_program) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    // Set vertix attribute pointers?
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (3 * sizeof(float)), (void*)0);
+    // Set vertex position attribute pointers.
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (6 * sizeof(float)), (void*)0);
     glEnableVertexAttribArray(0);
+    // Set vertex color attribute pointers.
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (6 * sizeof(float)), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
 
