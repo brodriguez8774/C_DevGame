@@ -18,6 +18,7 @@
 
 
 // Import headers.
+#include <math.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,16 +36,19 @@
 
 
 // Variable Declaration.
+
 // Shaders copied from https://learnopengl.com/Getting-started/Hello-Triangle
 const char* VERTEX_SHADER_SOURCE = "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n\n"
 "void main() {\n"
-"    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+"    gl_Position = vec4(aPos, 1.0);\n"
 "}\n\0 ";
+
 const char* FRAGMENT_SHADER_SOURCE = "#version 330 core\n"
-"out vec4 FragColor;\n\n"
+"uniform vec4 generated_color;\n"
+"out vec4 frag_color;\n\n"
 "void main() {\n"
-"    FragColor = vec4(0.0f, 0.0f, 1.0f, 1.0f);\n"
+"    frag_color = generated_color;\n"
 "}\n\0 ";
 
 
@@ -247,8 +251,14 @@ void render_data(unsigned int shader_program) {
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
 
+    // Set shader color.
+    float time_value = glfwGetTime();
+    float green = (sin(time_value) / 2.0f) + 0.5f;
+    int vertex_color_location = glGetUniformLocation(shader_program, "generated_color");
+
     // Use shader program when rendering.
     glUseProgram(shader_program);
+    glUniform4f(vertex_color_location, 0.0f, green, 0.0f, 1.0f);
 
     // Draw object.
     glDrawElements(GL_TRIANGLES, (sizeof(indices) / 3), GL_UNSIGNED_INT, 0);
